@@ -16,14 +16,13 @@ export const validate = (schema: AnySchema) => {
     } catch (errorYup) {
       const errors = formatErrorYup(errorYup);
 
-      next(
-        new AppError({
-          id: 'middleware.validate',
-          statusCode: StatusCodes.BAD_REQUEST,
-          message: 'INVALID_BODY',
-          errors,
-        }),
-      );
+      const error = new AppError({
+        id: 'middleware.validate',
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: 'INVALID_BODY',
+        errors,
+      });
+      next(error);
     }
   };
 };

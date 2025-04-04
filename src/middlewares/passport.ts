@@ -3,9 +3,10 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import { ConfigEnvironment } from '~/config/env';
+import { logger } from '~/config/logger';
+import { EAuthProvider, EUserGender } from '~/modules/auth/models/user.model';
 
-import { EAuthProvider } from '~/modules/auth/models/auth.model';
-import { AuthService } from '~/modules/auth/services/auth.service';
+import { UserService } from '~/modules/auth/services/user.service';
 import { AppError } from '~/utils/app-error';
 
 // config lay token o headers moi request
@@ -17,7 +18,7 @@ const jwtOptions = {
 passport.use(
   new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
     try {
-      const user = await AuthService.getById(jwtPayload.id);
+      const user = await UserService.getById(jwtPayload.id);
 
       if (!user) {
         throw new AppError({
@@ -46,6 +47,8 @@ passport.use(
       try {
         const email = profile.emails?.[0].value || '';
 
+        logger.info('profile google', profile);
+
         if (!email)
           throw new AppError({
             id: 'middleware.passportjs',
@@ -53,10 +56,16 @@ passport.use(
             statusCode: StatusCodes.BAD_REQUEST,
           });
 
-        const user = await AuthService.registerBySocial({
-          data: { email, name: profile.displayName, password: '' },
-          providerId: profile.id,
-          provider: EAuthProvider.Google,
+        const user = await UserService.registerBySocial(EAuthProvider.Google, {
+          email,
+          name: profile.displayName,
+          gender: EUserGender.NA,
+          username: email,
+          password: '',
+          phoneNumber: '',
+          avatar: '',
+          website: '',
+          bio: '',
         });
 
         return done(null, user);

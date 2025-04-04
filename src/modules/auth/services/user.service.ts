@@ -1,14 +1,16 @@
 import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
+import { isEmpty } from 'lodash';
 
 import { ConfigEnvironment } from '~/config/env';
-import { LoginDTO, RegisterDTO } from '../dtos/auth.dto';
-import { EAuthProvider, IUser } from '../models/auth.model';
-import { AuthRepository } from '../repositories/auth.repository';
+import { LoginDTO, RegisterDTO } from '../dtos/user.dto';
+import { EAuthProvider, IUser } from '../models/user.model';
 import { AppError } from '~/utils/app-error';
+import { UserRepository } from '../repositories/user.repository';
+import { IErrors } from '~/types/error';
 
-export class AuthService {
+export class UserService {
   static generateToken(user: IUser) {
     // generate token jsonwebtoken 1 day expire
     const token = jwt.sign({ id: user._id }, ConfigEnvironment.jwtSecret, {
@@ -24,24 +26,24 @@ export class AuthService {
   }
 
   static async getById(userId: string) {
-    const user = await AuthRepository.getById(userId);
+    const user = await UserRepository.getById(userId);
 
     return user;
   }
 
-  static async getByProvider(provider: EAuthProvider, providerId: string) {
-    const user = await AuthRepository.getByProvider(provider, providerId);
+  static async getByEmail(email: string) {
+    const user = await UserRepository.getByEmail(email);
 
     return user;
   }
 
   static async getMe(userId: string) {
     // b1. check user exist
-    const user = await AuthRepository.getById(userId);
+    const user = await UserRepository.getById(userId);
 
     if (!user) {
       throw new AppError({
-        id: 'AuthService.getMe',
+        id: 'UserService.getMe',
         statusCode: StatusCodes.UNAUTHORIZED,
         message: 'UNAUTHORIZE',
       });
@@ -55,14 +57,27 @@ export class AuthService {
 
   static async registerByAccount(data: RegisterDTO) {
     // b1. check email exist
-    const existingUser = await AuthRepository.getByEmail(data.email);
+    const errors: IErrors = {};
+
+    const existingUser = await this.getByEmail(data.email);
 
     if (existingUser) {
+      errors.email = [{ id: 'EMAIL_EXISTED', message: 'EMAIL_EXISTED' }];
+    }
+
+    // b1. check email exist
+    const existingUserName = await UserRepository.getByKey('username', data.username);
+
+    if (existingUserName) {
+      errors.username = [{ id: 'USERNAME_EXISTED', message: 'USERNAME_EXISTED' }];
+    }
+
+    if (!isEmpty(errors)) {
       throw new AppError({
-        id: 'AuthService.registerByAccount',
-        statusCode: StatusCodes.BAD_REQUEST,
-        message: 'EMAIL_EXISTED',
-        errors: { email: [{ id: 'EMAIL_EXISTED', message: 'EMAIL_EXISTED' }] },
+        id: 'UserService.registerByAccount',
+        statusCode: StatusCodes.UNAUTHORIZED,
+        message: 'INVALID_BODY',
+        errors,
       });
     }
 
@@ -70,7 +85,7 @@ export class AuthService {
     const salt = bcrypt.genSaltSync(10);
     const passwordHash = bcrypt.hashSync(data.password, salt);
 
-    const user = await AuthRepository.registerByAccount({
+    const user = await UserRepository.registerByAccount(EAuthProvider.Account, {
       ...data,
       password: passwordHash,
     });
@@ -83,15 +98,15 @@ export class AuthService {
 
   static async loginByAccount(data: LoginDTO) {
     // b1. check user exist
-    const user = await AuthRepository.getByEmail(data.email);
+    const user = await UserRepository.getByUsernameOrEmail(data.username);
 
     if (!user) {
       throw new AppError({
-        id: 'AuthService.loginByAccount',
+        id: 'UserService.loginByAccount',
         statusCode: StatusCodes.BAD_REQUEST,
         message: 'ACCOUNT_NOT_CORRECT',
         errors: {
-          email: [{ id: 'ACCOUNT_NOT_CORRECT', message: 'ACCOUNT_NOT_CORRECT' }],
+          username: [{ id: 'ACCOUNT_NOT_CORRECT', message: 'ACCOUNT_NOT_CORRECT' }],
           password: [{ id: 'ACCOUNT_NOT_CORRECT', message: 'ACCOUNT_NOT_CORRECT' }],
         },
       });
@@ -102,11 +117,11 @@ export class AuthService {
 
     if (!isMatching) {
       throw new AppError({
-        id: 'AuthService.loginByAccount',
+        id: 'UserService.loginByAccount',
         statusCode: StatusCodes.BAD_REQUEST,
         message: 'ACCOUNT_NOT_CORRECT',
         errors: {
-          email: [{ id: 'ACCOUNT_NOT_CORRECT', message: 'ACCOUNT_NOT_CORRECT' }],
+          username: [{ id: 'ACCOUNT_NOT_CORRECT', message: 'ACCOUNT_NOT_CORRECT' }],
           password: [{ id: 'ACCOUNT_NOT_CORRECT', message: 'ACCOUNT_NOT_CORRECT' }],
         },
       });
@@ -118,38 +133,40 @@ export class AuthService {
     return { user: this.withoutPassword(user), token };
   }
 
-  static async registerBySocial(payload: {
-    data: RegisterDTO;
-    provider: EAuthProvider;
-    providerId: string;
-  }) {
-    const { data, provider, providerId } = payload;
-
-    const userSocial = await this.getByProvider(provider, providerId);
+  static async registerBySocial(provider: EAuthProvider, data: RegisterDTO) {
+    const userSocial = await this.getByEmail(data.email);
 
     // exist user provider
     if (userSocial) {
       return userSocial;
     }
 
-    // not account social
-    // b1. check user exist
-    const existUser = await AuthRepository.getByEmail(data.email);
+    // b1. check email exist
+    const errors: IErrors = {};
 
-    if (existUser) {
+    const existingUser = await this.getByEmail(data.email);
+
+    if (existingUser) {
+      errors.email = [{ id: 'EMAIL_EXISTED', message: 'EMAIL_EXISTED' }];
+    }
+
+    // b1. check email exist
+    const existingUserName = await UserRepository.getByKey('username', data.username);
+
+    if (existingUserName) {
+      errors.username = [{ id: 'USERNAME_EXISTED', message: 'USERNAME_EXISTED' }];
+    }
+
+    if (!isEmpty(errors)) {
       throw new AppError({
-        id: 'AuthService.registerBySocial',
-        statusCode: StatusCodes.BAD_REQUEST,
-        message: 'EMAIL_EXISTED',
+        id: 'UserService.registerBySocial',
+        statusCode: StatusCodes.UNAUTHORIZED,
+        message: 'INVALID_BODY',
+        errors,
       });
     }
 
-    // b2. create user
-    const user = await AuthRepository.registerBySocial({
-      data,
-      provider,
-      providerId,
-    });
+    const user = await UserRepository.registerByAccount(provider, data);
 
     return user;
   }

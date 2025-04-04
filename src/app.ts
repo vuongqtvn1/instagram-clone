@@ -1,6 +1,6 @@
 import compression from 'compression';
 import cors from 'cors';
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import passport from 'passport';
 
@@ -35,7 +35,8 @@ app.use(/(.*)/, () => {
 });
 
 // handler error
-app.use((err: any, req: Request, res: Response) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   const language = req.headers['accept-language'] === 'en' ? 'en' : 'vi';
 
   logger.error(`${err.message} - ${req.method} ${req.url} - ${req.ip}`);

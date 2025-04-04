@@ -1,11 +1,14 @@
 {
   "API_NOTFOUND": "API endpoint not found",
-  "INTERNAL_SERVER_ERROR": "Internal server error",
-  "EMAIL_NOT_VALID": "Invalid email address",
+  "INTERNAL_SERVER_ERROR": "System error",
+  "EMAIL_NOT_VALID": "Invalid email",
   "UNAUTHORIZE": "You are not logged in",
-  "INVALID_BODY": "Invalid request data",
+  "FORBIDDEN": "You do not have permission",
+  "INVALID_BODY": "Invalid data",
   "FIELD_REQUIRED": "This field is required",
-  "FIELD_FORMAT": "This field has an incorrect format",
+  "FIELD_FORMAT": "This field has an invalid format",
   "EMAIL_EXISTED": "Email already exists",
-  "ACCOUNT_NOT_CORRECT": "Incorrect email or password"
+  "USERNAME_EXISTED": "Username already exists",
+  "ACCOUNT_NOT_CORRECT": "Email/username or password is incorrect",
+  "NOTFOUND": "Data not found in the system"
 }

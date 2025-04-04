@@ -7,6 +7,8 @@ export const ConfigEnvironment = {
   mongoUri: process.env.MONGO_URI || '',
   mongoDbName: process.env.MONGO_DB || '',
   jwtSecret: process.env.JWT_SECRET || '',
+  jwtAdminSecret: process.env.JWT_ADMIN_SECRET || '',
   googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+  seedingPermission: process.env.SEEDING_PERMISSION === 'true',
 };

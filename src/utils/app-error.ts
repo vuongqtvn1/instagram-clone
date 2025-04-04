@@ -1,13 +1,13 @@
 import { StatusCodes } from 'http-status-codes';
 import i18nClient from '~/i18n';
-import { IAppError } from '~/types/error';
+import { IAppError, IErrors } from '~/types/error';
 
 export class AppError implements IAppError {
   id: string;
   message: string; // id cua i18n
   statusCode: StatusCodes;
   detail?: any;
-  errors?: Record<string, Array<{ id: string; message: string }>>; // id cua i18n
+  errors?: IErrors; // id cua i18n
   params?: Record<string, any> = {};
 
   constructor({ id, message, statusCode, detail, errors, params }: IAppError) {

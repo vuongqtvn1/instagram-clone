@@ -1,7 +1,8 @@
 import * as yup from 'yup';
 
-export const registerSchema = yup.object({
+export const createAdminSchema = yup.object({
   name: yup.string().required('FIELD_REQUIRED'),
+  role: yup.string().required('FIELD_REQUIRED'),
   email: yup
     .string()
     .email('FIELD_FORMAT')
@@ -12,10 +13,9 @@ export const registerSchema = yup.object({
       { message: 'FIELD_FORMAT' },
     )
     .required('FIELD_REQUIRED'),
-  password: yup.string().required('FIELD_REQUIRED'),
 });
 
-export const loginSchema = yup.object({
+export const loginAdminSchema = yup.object({
   email: yup
     .string()
     .email('FIELD_FORMAT')

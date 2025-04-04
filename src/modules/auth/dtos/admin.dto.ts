@@ -1,12 +1,12 @@
 // Data Transfer Object (DTO)
 
-export interface RegisterDTO {
+export interface CreateAdminDTO {
   name: string;
+  role: string;
   email: string;
-  password: string;
 }
 
-export interface LoginDTO {
+export interface LoginAdminDTO {
   email: string;
   password: string;
 }

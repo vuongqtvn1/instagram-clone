@@ -1,9 +1,13 @@
 import { Router } from 'express';
 
-import authRoutes from './routes/auth.routes';
+import userRouter from './routes/user.routes';
+import adminRouter from './routes/admin.routes';
+import rolesRouter from './routes/role.routes';
 
 const authModule = Router();
 
-authModule.use('/auth', authRoutes);
+authModule.use('/users', userRouter);
+authModule.use('/admins', adminRouter);
+authModule.use('/roles', rolesRouter);
 
 export default authModule;
