@@ -7,3 +7,5 @@ const PORT = ConfigEnvironment.port;
 app.listen(PORT, () => {
   logger.info(`🚀 Server is running on http://localhost:${PORT}`);
 });
+
+logger.info('HELLO');
