@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { logger } from '~/config/logger';
 import { ConfigEnvironment } from './env';
-import { RoleRepository } from '~/modules/auth/repositories/role.repository';
+import { RoleRepository } from '~/modules/account/repositories/role.repository';
 
 dotenv.config();
 

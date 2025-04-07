@@ -4,9 +4,9 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import { ConfigEnvironment } from '~/config/env';
 import { logger } from '~/config/logger';
-import { EAuthProvider, EUserGender } from '~/modules/auth/models/user.model';
+import { EAuthProvider, EUserGender } from '~/modules/account/models/user.model';
 
-import { UserService } from '~/modules/auth/services/user.service';
+import { UserService } from '~/modules/account/services/user.service';
 import { AppError } from '~/utils/app-error';
 
 // config lay token o headers moi request

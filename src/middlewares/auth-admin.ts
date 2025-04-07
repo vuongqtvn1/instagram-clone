@@ -3,8 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
 
 import { ConfigEnvironment } from '~/config/env';
-import { EPermissions } from '~/modules/auth/models/permission.model';
-import { RoleService } from '~/modules/auth/services/role.service';
+import { EPermissions } from '~/modules/account/models/permission.model';
+import { RoleService } from '~/modules/account/services/role.service';
 import { AppError } from '~/utils/app-error';
 
 export const authAdminMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -20,10 +20,10 @@ export const authAdminMiddleware = (req: Request, res: Response, next: NextFunct
     }
 
     const decoded = jwt.verify(token, ConfigEnvironment.jwtAdminSecret) as jwt.JwtPayload & {
-      userId: string;
+      id: string;
     };
 
-    if (!decoded?.data?.userId) {
+    if (!decoded?.id) {
       throw new AppError({
         id: 'middleware.authorize',
         message: 'UNAUTHORIZE',
@@ -31,7 +31,7 @@ export const authAdminMiddleware = (req: Request, res: Response, next: NextFunct
       });
     }
 
-    req.headers.userId = decoded.data.userId;
+    req.headers.userId = decoded.id;
     next();
   } catch (error) {
     if (error instanceof AppError) {
