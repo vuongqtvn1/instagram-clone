@@ -5,6 +5,11 @@ export const createCommentSchema = yup.object({
   postId: yup.string().required('FIELD_REQUIRED'),
 });
 
+export const replyCommentSchema = yup.object({
+  content: yup.string().trim().required('FIELD_REQUIRED'),
+  commentId: yup.string().required('FIELD_REQUIRED'),
+});
+
 export const updateCommentSchema = yup.object({
   content: yup.string().trim().required('FIELD_REQUIRED'),
 });

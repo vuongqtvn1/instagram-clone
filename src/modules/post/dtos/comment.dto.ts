@@ -5,6 +5,11 @@ export interface CreateCommentDTO {
   postId: string;
 }
 
+export interface ReplyCommentDTO {
+  content: string;
+  commentId: string;
+}
+
 export interface UpdateCommentDTO {
   content: string;
 }

@@ -11,7 +11,6 @@
   "USERNAME_EXISTED": "Username đã tồn tại",
   "ACCOUNT_NOT_CORRECT": "Email/username hoặc mật khẩu không chính xác",
   "NOTFOUND": "Dữ liệu chưa tồn tại trong hệ thống",
-  "gender must be one of the following values: male, female, N/A": "gender must be one of the following values: male, female, N/A",
-  "Bạn không thể follow chính mình!": "Bạn không thể follow chính mình!",
-  "Bạn không thể unfollow chính mình!": "Bạn không thể unfollow chính mình!"
+  "Invalid image file": "Invalid image file",
+  "Người dùng không tồn tại!": "Người dùng không tồn tại!"
 }

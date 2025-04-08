@@ -3,7 +3,11 @@ import { Router } from 'express';
 import passport from 'passport';
 import { validate } from '~/middlewares/validate';
 import { CommentController } from '../controllers/comment.controller';
-import { createCommentSchema, updateCommentSchema } from '../validators/comment.validator';
+import {
+  createCommentSchema,
+  replyCommentSchema,
+  updateCommentSchema,
+} from '../validators/comment.validator';
 
 const router = Router();
 
@@ -13,6 +17,13 @@ router.post(
   passport.authenticate('jwt', { session: false }),
   validate(createCommentSchema),
   CommentController.create,
+);
+
+router.post(
+  '/reply',
+  passport.authenticate('jwt', { session: false }),
+  validate(replyCommentSchema),
+  CommentController.reply,
 );
 
 // sua binh luan

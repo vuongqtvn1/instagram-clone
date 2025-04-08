@@ -9,6 +9,10 @@ import { EAuthProvider, IUser } from '../models/user.model';
 import { AppError } from '~/utils/app-error';
 import { UserRepository } from '../repositories/user.repository';
 import { IErrors } from '~/types/error';
+import { NotificationModel } from '~/modules/notification/models/notification.model';
+import { io, onlineUsers } from '~/config/redis';
+import { PostService } from '~/modules/post/services/post.service';
+import { BaseFilters } from '~/utils/repository';
 
 export class UserService {
   static generateToken(user: IUser) {
@@ -208,6 +212,23 @@ export class UserService {
     }
 
     await UserRepository.follow(userId, followerUserId);
+
+    // Tạo thông báo
+    const notification = await NotificationModel.create({
+      sender: userId,
+      receiver: followerUserId,
+      type: 'follow',
+    });
+
+    // Gửi thông báo realtime qua WebSocket nếu người nhận đang online
+    const receiverSocketId = onlineUsers.get(followerUserId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('new_notification', {
+        sender: userId,
+        type: 'follow',
+        notification,
+      });
+    }
   }
 
   // Unfollow user
@@ -276,5 +297,24 @@ export class UserService {
     }
 
     return isArray(user.followings) ? user.followings : [];
+  }
+
+  static async getPostsByUserId(userId: string, filters: BaseFilters) {
+    const user = await UserRepository.getById(userId);
+
+    if (!user) {
+      throw new AppError({
+        id: 'UserService.getPostsByUserId',
+        statusCode: StatusCodes.NOT_FOUND,
+        message: 'Người dùng không tồn tại!',
+      });
+    }
+
+    const result = await PostService.getPagination({
+      ...filters,
+      createdBy: [userId],
+    });
+
+    return result;
   }
 }

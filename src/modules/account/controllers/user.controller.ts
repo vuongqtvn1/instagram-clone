@@ -6,6 +6,7 @@ import { HttpResponse } from '~/utils/http-response';
 import { LoginDTO, RegisterDTO } from '../dtos/user.dto';
 import { IUser } from '../models/user.model';
 import { UserService } from '../services/user.service';
+import { BaseFilters } from '~/utils/repository';
 
 export class UserController {
   static async register(request: Request, response: Response, next: NextFunction) {
@@ -105,6 +106,29 @@ export class UserController {
       const userId = request.params.userId as string;
 
       const data = await UserService.getFollowings(userId);
+
+      response.status(StatusCodes.OK).json(HttpResponse.get({ data }));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getPosts(request: Request, response: Response, next: NextFunction) {
+    try {
+      const userId = request.params.userId as string;
+
+      const query = request.query;
+
+      const { page = 1, limit = 10, sort, order } = query;
+
+      const filters: BaseFilters = {
+        page: Number(page),
+        limit: Number(limit),
+        sort: sort as string,
+        order: order === 'ASC' ? 'ASC' : 'DESC',
+      };
+
+      const data = await UserService.getPostsByUserId(userId, filters);
 
       response.status(StatusCodes.OK).json(HttpResponse.get({ data }));
     } catch (error) {

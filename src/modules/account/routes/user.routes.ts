@@ -39,5 +39,10 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   UserController.getFollowings,
 );
+router.get(
+  '/:userId/posts',
+  passport.authenticate('jwt', { session: false }),
+  UserController.getPosts,
+);
 
 export default router;

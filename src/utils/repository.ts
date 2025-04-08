@@ -51,14 +51,10 @@ export class BaseRepository {
   ) {
     const { sort, paginate } = BaseRepository.getQuery(filters);
 
-    const data = await model
-      .find(condition)
-      .sort(sort)
-      .skip(paginate.skip)
-      .limit(paginate.limit)
-      .lean();
-
-    const totalData = await model.find(condition).countDocuments();
+    const [data, totalData] = await Promise.all([
+      model.find(condition).sort(sort).skip(paginate.skip).limit(paginate.limit).lean(),
+      model.find(condition).countDocuments(),
+    ]);
 
     return { data, totalData };
   }

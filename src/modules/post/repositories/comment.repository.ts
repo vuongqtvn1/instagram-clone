@@ -18,6 +18,24 @@ export class CommentRepository {
     return result.toObject();
   }
 
+  static async reply(payload: {
+    createdBy: string;
+    postId: string;
+    parentCommentId: string;
+    content: string;
+  }) {
+    const { content, createdBy, parentCommentId, postId } = payload;
+    const result = await CommentModel.create({ createdBy, post: postId, content });
+
+    const replyComment = result.toObject();
+
+    await CommentModel.findByIdAndUpdate(parentCommentId, {
+      $push: { replies: replyComment._id },
+    });
+
+    return replyComment;
+  }
+
   static async update(id: string, data: UpdateCommentDTO) {
     const result = await CommentModel.findByIdAndUpdate(id, data, { new: true }).lean();
 

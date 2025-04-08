@@ -1,5 +1,6 @@
 // Data Transfer Object (DTO)
 
+import { BaseFilters } from '~/utils/repository';
 import { IPostMedia } from '../models/post.model';
 
 export interface CreatePostDTO {
@@ -11,4 +12,11 @@ export interface CreatePostDTO {
 export interface UpdatePostDTO {
   media: Array<IPostMedia>;
   caption: string;
+}
+
+export interface PostFilters extends BaseFilters {
+  createdBy?: string[];
+  isReel?: boolean;
+  savedBy?: string[];
+  excludes?: string[];
 }

@@ -8,8 +8,11 @@ import { CommentController } from '../controllers/comment.controller';
 
 const router = Router();
 
-// get bai viet
-router.get('/', passport.authenticate('jwt', { session: false }), PostController.getList);
+// get bai viet theo followings => ngau nhien
+router.get('/', passport.authenticate('jwt', { session: false }), PostController.getByFollowings);
+
+// get bai viet ngau nhien
+router.get('/explore', passport.authenticate('jwt', { session: false }), PostController.getExplore);
 
 // tao bai viet
 router.post(
@@ -30,10 +33,29 @@ router.put(
 // xoa bai viet
 router.delete('/:id', passport.authenticate('jwt', { session: false }), PostController.delete);
 
+// lay danh sach comment
 router.get(
   '/:id/comments',
   passport.authenticate('jwt', { session: false }),
   CommentController.getListByPost,
+);
+
+// like post
+router.put('/:id/like', passport.authenticate('jwt', { session: false }), PostController.likePost);
+
+// unlike post
+router.put(
+  '/:id/unlike',
+  passport.authenticate('jwt', { session: false }),
+  PostController.unlikePost,
+);
+// save post
+router.put('/:id/save', passport.authenticate('jwt', { session: false }), PostController.savePost);
+// unsave post
+router.put(
+  '/:id/unsave',
+  passport.authenticate('jwt', { session: false }),
+  PostController.unSavePost,
 );
 
 export default router;

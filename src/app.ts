@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import passport from 'passport';
 
 import { StatusCodes } from 'http-status-codes';
+import multer from 'multer';
 import { connectDB } from './config/database';
 import { logger } from './config/logger';
 import i18nClient from './i18n';
@@ -46,9 +47,10 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
     res.status(err.statusCode).json(err);
   } else {
+    console.log(err);
     const error = new AppError({
       id: 'app.middleware',
-      message: 'INTERNAL_SERVER_ERROR',
+      message: err.message || 'INTERNAL_SERVER_ERROR',
       detail: err.message,
       statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
     });

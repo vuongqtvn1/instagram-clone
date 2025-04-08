@@ -15,6 +15,23 @@ export class WebsocketClient {
 
     io.on('connection', (socket) => {
       this.sockets.push(socket.id);
+
+      logger.info('🔵 Người dùng kết nối:', socket.id);
+
+      socket.on('joinChat', (chatId) => {
+        socket.join(chatId);
+      });
+
+      socket.on('sendMessage', async ({ chatId, sender, text }) => {
+        // const message = new Message({ chatId, sender, text });
+        // await message.save();
+        // await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id });
+        // io.to(chatId).emit('newMessage', message);
+      });
+
+      socket.on('disconnect', () => {
+        logger.info('🔴 Người dùng rời khỏi:', socket.id);
+      });
     });
   }
 

@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { IUser } from '~/modules/account/models/user.model';
 import { HttpResponse } from '~/utils/http-response';
-import { CreateCommentDTO, UpdateCommentDTO } from '../dtos/comment.dto';
+import { CreateCommentDTO, ReplyCommentDTO, UpdateCommentDTO } from '../dtos/comment.dto';
 import { CommentService } from '../services/comment.service';
 
 export class CommentController {
@@ -14,6 +14,20 @@ export class CommentController {
       const data = request.body as CreateCommentDTO;
 
       const result = await CommentService.create(createdBy, data);
+
+      response.status(StatusCodes.CREATED).json(HttpResponse.created({ data: result }));
+    } catch (error: any) {
+      next(error);
+    }
+  }
+
+  static async reply(request: Request, response: Response, next: NextFunction) {
+    try {
+      const user = request.user as IUser;
+      const createdBy = String(user?._id);
+      const data = request.body as ReplyCommentDTO;
+
+      const result = await CommentService.reply(createdBy, data);
 
       response.status(StatusCodes.CREATED).json(HttpResponse.created({ data: result }));
     } catch (error: any) {
