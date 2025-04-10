@@ -5,7 +5,6 @@ import morgan from 'morgan';
 import passport from 'passport';
 
 import { StatusCodes } from 'http-status-codes';
-import multer from 'multer';
 import { connectDB } from './config/database';
 import { logger } from './config/logger';
 import i18nClient from './i18n';
@@ -21,6 +20,7 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(compression());
+app.use(express.urlencoded());
 app.use(i18nClient.init);
 app.use(passport.initialize());
 

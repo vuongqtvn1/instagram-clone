@@ -1,11 +1,16 @@
+import { v2 as cloudinary } from 'cloudinary';
 import { extractPublicId } from 'cloudinary-build-url';
 
-import { cloudinaryClient } from '../middlewares/multer';
+cloudinary.config({
+  cloud_name: 'vuongute',
+  api_key: '448585553237892',
+  api_secret: 'kHsci-mPjr-AZOPHpw56Vc8Yw5I',
+});
 
 export class UploadService {
   static async deleteFileByPath(path: string) {
     const publicId = extractPublicId(path);
-    await cloudinaryClient.uploader.destroy(publicId);
+    await cloudinary.uploader.destroy(publicId);
   }
 
   static deleteFileByPaths = async (paths: string[]) => {

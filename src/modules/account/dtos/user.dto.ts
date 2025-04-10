@@ -18,3 +18,13 @@ export interface LoginDTO {
   username: string; // username / email
   password: string;
 }
+
+export interface UserInformationDTO {
+  website: string;
+  gender: string;
+  bio: string;
+}
+
+export interface UserAvatarDTO {
+  avatarUrl: string;
+}

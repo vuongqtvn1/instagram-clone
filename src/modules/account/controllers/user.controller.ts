@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { logger } from '~/config/logger';
 import { HttpResponse } from '~/utils/http-response';
-import { LoginDTO, RegisterDTO } from '../dtos/user.dto';
+import { LoginDTO, RegisterDTO, UserAvatarDTO, UserInformationDTO } from '../dtos/user.dto';
 import { IUser } from '../models/user.model';
 import { UserService } from '../services/user.service';
 import { BaseFilters } from '~/utils/repository';
@@ -131,6 +131,34 @@ export class UserController {
       const data = await UserService.getPostsByUserId(userId, filters);
 
       response.status(StatusCodes.OK).json(HttpResponse.get({ data }));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateInformation(request: Request, response: Response, next: NextFunction) {
+    try {
+      const user = request.user as IUser;
+      const userId = String(user?._id);
+      const data = request.body as UserInformationDTO;
+
+      const result = await UserService.updateUserInformation(userId, data);
+
+      response.status(StatusCodes.OK).json(HttpResponse.updated({ data: result }));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateAvatar(request: Request, response: Response, next: NextFunction) {
+    try {
+      const user = request.user as IUser;
+      const userId = String(user?._id);
+      const data = request.body as UserAvatarDTO;
+
+      const result = await UserService.updateUserAvatar(userId, data.avatarUrl);
+
+      response.status(StatusCodes.OK).json(HttpResponse.updated({ data: result }));
     } catch (error) {
       next(error);
     }

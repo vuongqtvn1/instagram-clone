@@ -3,6 +3,7 @@ import { UserModel } from '~/modules/account/models/user.model';
 import { BaseRepository } from '~/utils/repository';
 import { CreatePostDTO, PostFilters, UpdatePostDTO } from '../dtos/post.dto';
 import { PostModel } from '../models/post.model';
+import { CommentModel } from '../models/comment.model';
 
 export class PostRepository {
   static getQuery(filters: PostFilters) {
@@ -51,8 +52,8 @@ export class PostRepository {
     return BaseRepository.getPagination(PostModel, condition, filters);
   }
 
-  static async getById(id: string) {
-    return PostModel.findById(id).lean();
+  static async getById(postId: string) {
+    return PostModel.findById(postId).lean();
   }
 
   static async create(createdBy: string, data: CreatePostDTO) {
@@ -66,8 +67,11 @@ export class PostRepository {
     return result;
   }
 
-  static async delete(id: string, createdBy: string) {
-    const result = await PostModel.findOneAndDelete({ _id: id, createdBy }).lean();
+  static async delete(postId: string, createdBy: string) {
+    const result = await PostModel.findOneAndDelete({ _id: postId, createdBy }).lean();
+
+    CommentModel.deleteMany({ post: postId });
+    UserModel.updateMany({ saved: { $in: [postId] } }, { $pull: { saved: postId } });
 
     return result;
   }

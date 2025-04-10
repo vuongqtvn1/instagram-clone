@@ -26,3 +26,13 @@ export const loginUserSchema = yup.object({
   username: yup.string().trim().lowercase().required('FIELD_REQUIRED'),
   password: yup.string().required('FIELD_REQUIRED'),
 });
+
+export const updateInformationSchema = yup.object({
+  gender: yup.mixed<EUserGender>().oneOf(Object.values(EUserGender)).required('FIELD_REQUIRED'),
+  website: yup.string().trim().default(''),
+  bio: yup.string().trim().default(''),
+});
+
+export const updateAvatarSchema = yup.object({
+  avatarUrl: yup.string().trim().required('FIELD_REQUIRED'),
+});

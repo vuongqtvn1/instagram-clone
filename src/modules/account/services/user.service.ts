@@ -4,13 +4,13 @@ import jwt from 'jsonwebtoken';
 import { isArray, isEmpty } from 'lodash';
 
 import { ConfigEnvironment } from '~/config/env';
-import { LoginDTO, RegisterDTO } from '../dtos/user.dto';
+import { LoginDTO, RegisterDTO, UserInformationDTO } from '../dtos/user.dto';
 import { EAuthProvider, IUser } from '../models/user.model';
 import { AppError } from '~/utils/app-error';
 import { UserRepository } from '../repositories/user.repository';
 import { IErrors } from '~/types/error';
 import { NotificationModel } from '~/modules/notification/models/notification.model';
-import { io, onlineUsers } from '~/config/redis';
+// import { io, onlineUsers } from '~/config/redis';
 import { PostService } from '~/modules/post/services/post.service';
 import { BaseFilters } from '~/utils/repository';
 
@@ -214,21 +214,21 @@ export class UserService {
     await UserRepository.follow(userId, followerUserId);
 
     // Tạo thông báo
-    const notification = await NotificationModel.create({
-      sender: userId,
-      receiver: followerUserId,
-      type: 'follow',
-    });
+    // const notification = await NotificationModel.create({
+    //   sender: userId,
+    //   receiver: followerUserId,
+    //   type: 'follow',
+    // });
 
-    // Gửi thông báo realtime qua WebSocket nếu người nhận đang online
-    const receiverSocketId = onlineUsers.get(followerUserId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit('new_notification', {
-        sender: userId,
-        type: 'follow',
-        notification,
-      });
-    }
+    // // Gửi thông báo realtime qua WebSocket nếu người nhận đang online
+    // const receiverSocketId = onlineUsers.get(followerUserId);
+    // if (receiverSocketId) {
+    //   io.to(receiverSocketId).emit('new_notification', {
+    //     sender: userId,
+    //     type: 'follow',
+    //     notification,
+    //   });
+    // }
   }
 
   // Unfollow user
@@ -314,6 +314,38 @@ export class UserService {
       ...filters,
       createdBy: [userId],
     });
+
+    return result;
+  }
+
+  static async updateUserInformation(userId: string, data: UserInformationDTO) {
+    const user = await UserRepository.getById(userId);
+
+    if (!user) {
+      throw new AppError({
+        id: 'UserService.updateUserInformation',
+        statusCode: StatusCodes.NOT_FOUND,
+        message: 'Người dùng không tồn tại!',
+      });
+    }
+
+    const result = await UserRepository.updateUserInformation(userId, data);
+
+    return result;
+  }
+
+  static async updateUserAvatar(userId: string, avatarUrl: string) {
+    const user = await UserRepository.getById(userId);
+
+    if (!user) {
+      throw new AppError({
+        id: 'UserService.updateUserAvatar',
+        statusCode: StatusCodes.NOT_FOUND,
+        message: 'Người dùng không tồn tại!',
+      });
+    }
+
+    const result = await UserRepository.updateUserAvatar(userId, avatarUrl);
 
     return result;
   }

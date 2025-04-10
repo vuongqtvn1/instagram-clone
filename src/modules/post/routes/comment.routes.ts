@@ -37,4 +37,18 @@ router.put(
 // xoa binh luan
 router.delete('/:id', passport.authenticate('jwt', { session: false }), CommentController.delete);
 
+// like comment
+router.put(
+  '/:id/like',
+  passport.authenticate('jwt', { session: false }),
+  CommentController.likeComment,
+);
+
+// unlike comment
+router.put(
+  '/:id/unlike',
+  passport.authenticate('jwt', { session: false }),
+  CommentController.unlikeComment,
+);
+
 export default router;

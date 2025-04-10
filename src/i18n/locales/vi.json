@@ -11,6 +11,12 @@
   "USERNAME_EXISTED": "Username đã tồn tại",
   "ACCOUNT_NOT_CORRECT": "Email/username hoặc mật khẩu không chính xác",
   "NOTFOUND": "Dữ liệu chưa tồn tại trong hệ thống",
+  "Tải file thất bại": "Tải file thất bại",
   "Invalid image file": "Invalid image file",
-  "Người dùng không tồn tại!": "Người dùng không tồn tại!"
+  "Multipart: Boundary not found": "Multipart: Boundary not found",
+  "this.cloudinary.uploader.upload_large_stream is not a function": "this.cloudinary.uploader.upload_large_stream is not a function",
+  "cloudinary_1.v2.uploader.upload_large_stream is not a function": "cloudinary_1.v2.uploader.upload_large_stream is not a function",
+  "Unsupported file type jpeg": "Unsupported file type jpeg",
+  "Bình luận không tồn tại": "Bình luận không tồn tại",
+  "Bạn đã thích bình luận này rồi!": "Bạn đã thích bình luận này rồi!"
 }

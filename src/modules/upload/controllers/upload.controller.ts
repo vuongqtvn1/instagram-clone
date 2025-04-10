@@ -13,7 +13,7 @@ export class UploadController {
       if (!request.file?.path) {
         throw new AppError({
           id: 'upload.controller.uploadImage',
-          message: 'Tải file thất bại',
+          message: 'Tải ảnh thất bại',
           statusCode: StatusCodes.BAD_REQUEST,
         });
       }
@@ -33,7 +33,7 @@ export class UploadController {
       if (!request.file?.path) {
         throw new AppError({
           id: 'upload.controller.uploadVideo',
-          message: 'Tải file thất bại',
+          message: 'Tải video thất bại',
           statusCode: StatusCodes.BAD_REQUEST,
         });
       }

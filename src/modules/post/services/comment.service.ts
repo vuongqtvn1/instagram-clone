@@ -1,15 +1,31 @@
 import { StatusCodes } from 'http-status-codes';
 import { AppError } from '~/utils/app-error';
-import { PostRepository } from '../repositories/post.repository';
+import { BaseFilters } from '~/utils/repository';
 import { CreateCommentDTO, ReplyCommentDTO, UpdateCommentDTO } from '../dtos/comment.dto';
 import { CommentRepository } from '../repositories/comment.repository';
+import { PostRepository } from '../repositories/post.repository';
+import { UserService } from '~/modules/account/services/user.service';
 
 export class CommentService {
-  static getListByPost = async (postId: string) => {
-    const comments = await CommentRepository.getListByPost(postId);
+  static getListByPost = async (postId: string, filters: BaseFilters) => {
+    const comments = await CommentRepository.getPagination({
+      ...filters,
+      posts: [postId],
+    });
 
     return comments;
   };
+
+  static getListByComment = async (postId: string, commentId: string, filters: BaseFilters) => {
+    const comments = await CommentRepository.getPagination({
+      ...filters,
+      posts: [postId],
+      parentComments: [commentId],
+    });
+
+    return comments;
+  };
+
   // comment post
   static create = async (createdBy: string, data: CreateCommentDTO) => {
     const { content, postId } = data;
@@ -36,7 +52,7 @@ export class CommentService {
       });
     }
 
-    const comment = await CommentRepository.create(createdBy, data);
+    const comment = await CommentRepository.createPostComment(createdBy, data);
 
     await PostRepository.commentPost(data.postId, String(comment._id));
 
@@ -146,7 +162,6 @@ export class CommentService {
     return comment;
   };
 
-  // Cập nhập bài viết hoặc reels
   static delete = async (payload: { commentId: string; createdBy: string }) => {
     const { createdBy, commentId } = payload;
 
@@ -170,8 +185,92 @@ export class CommentService {
 
     const comment = await CommentRepository.delete(commentId, createdBy);
 
+    // xoá cái comment bị xoá ra khỏi mảng replies
+    if (olderComment.parentCommentId) {
+      const parentCommentId = String(olderComment.parentCommentId);
+      await CommentRepository.removeReplies(parentCommentId, commentId);
+    }
+
+    // xoá cái comment ra khỏi mảng comments trong bài post
     await PostRepository.removeCommentPost(String(olderComment.post), commentId);
 
     return comment;
   };
+
+  // like comment/ unlike comment
+  static async likeComment(commentId: string, userLike: string) {
+    const [comment, user] = await Promise.all([
+      CommentRepository.getById(commentId),
+      UserService.getById(userLike),
+    ]);
+
+    if (!comment) {
+      throw new AppError({
+        id: 'CommentService.likeComment',
+        statusCode: StatusCodes.NOT_FOUND,
+        message: 'Bình luận không tồn tại',
+      });
+    }
+
+    if (!user) {
+      throw new AppError({
+        id: 'CommentService.likeComment',
+        statusCode: StatusCodes.NOT_FOUND,
+        message: 'Người dùng không tồn tại!',
+      });
+    }
+
+    const likes = comment.likes.map((id) => String(id));
+
+    // Kiểm tra xem đã follow chưa
+    const alreadyLike = likes.includes(userLike);
+
+    if (alreadyLike) {
+      throw new AppError({
+        id: 'CommentService.likeComment',
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: 'Bạn đã thích bình luận này rồi!',
+      });
+    }
+
+    await CommentRepository.likeComment(commentId, userLike);
+  }
+
+  static async unlikeComment(commentId: string, userUnlike: string) {
+    const [comment, user] = await Promise.all([
+      CommentRepository.getById(commentId),
+      UserService.getById(userUnlike),
+    ]);
+
+    if (!comment) {
+      throw new AppError({
+        id: 'CommentService.unlikeComment',
+        statusCode: StatusCodes.NOT_FOUND,
+        message: 'Bình luận không tồn tại',
+      });
+    }
+
+    if (!user) {
+      throw new AppError({
+        id: 'CommentService.unlikeComment',
+        statusCode: StatusCodes.NOT_FOUND,
+        message: 'Người dùng không tồn tại!',
+      });
+    }
+
+    const likes = comment.likes.map((id) => String(id));
+
+    // Kiểm tra xem đã follow chưa
+    const alreadyLike = likes.includes(userUnlike);
+
+    if (!alreadyLike) {
+      throw new AppError({
+        id: 'CommentService.unlikeComment',
+        statusCode: StatusCodes.BAD_REQUEST,
+        message: 'Bạn chưa thích bình luận này!',
+      });
+    }
+
+    await CommentRepository.unlikeComment(commentId, userUnlike);
+  }
 }

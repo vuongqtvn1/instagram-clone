@@ -3,7 +3,12 @@ import passport from 'passport';
 
 import { validate } from '~/middlewares/validate';
 import { UserController } from '../controllers/user.controller';
-import { loginUserSchema, registerUserSchema } from '../validators/user.validator';
+import {
+  loginUserSchema,
+  registerUserSchema,
+  updateAvatarSchema,
+  updateInformationSchema,
+} from '../validators/user.validator';
 
 const router = Router();
 
@@ -43,6 +48,20 @@ router.get(
   '/:userId/posts',
   passport.authenticate('jwt', { session: false }),
   UserController.getPosts,
+);
+
+router.put(
+  '/:userId/information',
+  passport.authenticate('jwt', { session: false }),
+  validate(updateInformationSchema),
+  UserController.updateInformation,
+);
+
+router.put(
+  '/:userId/avatar',
+  passport.authenticate('jwt', { session: false }),
+  validate(updateAvatarSchema),
+  UserController.updateAvatar,
 );
 
 export default router;

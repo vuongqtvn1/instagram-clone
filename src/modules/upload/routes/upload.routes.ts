@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
 import passport from 'passport';
+import { validate } from '~/middlewares/validate';
 import { UploadController } from '../controllers/upload.controller';
 import { uploadImageClient, uploadVideoClient } from '../middlewares/multer';
-import { validate } from '~/middlewares/validate';
 import { removeFileSchema } from '../validators/upload.validator';
 
 const router = Router();

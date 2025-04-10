@@ -1,5 +1,7 @@
 // Data Transfer Object (DTO)
 
+import { BaseFilters } from '~/utils/repository';
+
 export interface CreateCommentDTO {
   content: string;
   postId: string;
@@ -12,4 +14,10 @@ export interface ReplyCommentDTO {
 
 export interface UpdateCommentDTO {
   content: string;
+}
+
+export interface CommentFilters extends BaseFilters {
+  createdBy?: string[];
+  posts?: string[];
+  parentComments?: string[];
 }

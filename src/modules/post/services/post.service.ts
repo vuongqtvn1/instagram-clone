@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
+import { UserService } from '~/modules/account/services/user.service';
 import { AppError } from '~/utils/app-error';
 import { CreatePostDTO, PostFilters, UpdatePostDTO } from '../dtos/post.dto';
 import { PostRepository } from '../repositories/post.repository';
-import { UserService } from '~/modules/account/services/user.service';
 
 export class PostService {
   // Tạo bài viết hoặc reels

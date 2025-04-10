@@ -33,11 +33,18 @@ router.put(
 // xoa bai viet
 router.delete('/:id', passport.authenticate('jwt', { session: false }), PostController.delete);
 
-// lay danh sach comment
+// lay danh sach comment tra bai post id nay => /posts/:id/comments
 router.get(
   '/:id/comments',
   passport.authenticate('jwt', { session: false }),
   CommentController.getListByPost,
+);
+
+// lay danh sach comment tra loi cua cai commentId nay => /posts/id/comments/:commentId/reply
+router.get(
+  '/:id/comments/:commentId/reply',
+  passport.authenticate('jwt', { session: false }),
+  CommentController.getListReplyByComment,
 );
 
 // like post

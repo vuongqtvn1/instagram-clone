@@ -5,6 +5,8 @@ const i18nClient = new I18n({
   defaultLocale: 'vi',
   locales: ['en', 'vi'],
   directory: path.join(__dirname, 'locales'),
+  autoReload: true,
+  syncFiles: false,
 });
 
 export default i18nClient;

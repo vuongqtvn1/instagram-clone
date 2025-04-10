@@ -1,4 +1,4 @@
-import { RegisterDTO } from '../dtos/user.dto';
+import { RegisterDTO, UserInformationDTO } from '../dtos/user.dto';
 import { EAuthProvider, IUser, UserModel } from '../models/user.model';
 
 export class UserRepository {
@@ -64,5 +64,19 @@ export class UserRepository {
 
   static async getFollowings(userId: string) {
     return UserModel.findById(userId).populate('followings', 'username name email avatar').lean();
+  }
+
+  static async updateUserInformation(userId: string, data: UserInformationDTO) {
+    return UserModel.findByIdAndUpdate(userId, {
+      bio: data.bio,
+      gender: data.gender,
+      website: data.website,
+    });
+  }
+
+  static async updateUserAvatar(userId: string, avatarUrl: string) {
+    return UserModel.findByIdAndUpdate(userId, {
+      avatar: avatarUrl,
+    });
   }
 }
