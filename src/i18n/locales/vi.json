@@ -18,5 +18,7 @@
   "cloudinary_1.v2.uploader.upload_large_stream is not a function": "cloudinary_1.v2.uploader.upload_large_stream is not a function",
   "Unsupported file type jpeg": "Unsupported file type jpeg",
   "Bình luận không tồn tại": "Bình luận không tồn tại",
-  "Bạn đã thích bình luận này rồi!": "Bạn đã thích bình luận này rồi!"
+  "Bạn đã thích bình luận này rồi!": "Bạn đã thích bình luận này rồi!",
+  "Dữ liệu không hợp lệ!": "Dữ liệu không hợp lệ!",
+  "Không có cuộc trò chuyện này": "Không có cuộc trò chuyện này"
 }

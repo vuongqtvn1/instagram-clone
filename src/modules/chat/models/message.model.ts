@@ -8,11 +8,12 @@ import mongoose from 'mongoose';
 
 const MessageSchema = new mongoose.Schema(
   {
-    chatId: { type: mongoose.Schema.Types.ObjectId, ref: 'Chat', required: true },
+    groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'GroupMessage', required: true },
     sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     text: { type: String },
-    image: { type: String },
-    video: { type: String },
+    images: [{ type: String }],
+    videos: [{ type: String }],
+    replyMessage: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
     seenBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: true },

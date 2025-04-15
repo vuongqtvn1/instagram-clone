@@ -1,11 +1,11 @@
 import { Router } from 'express';
 
-import postRouter from './routes/post.routes';
-import commentRouter from './routes/comment.routes';
+import messageRoutes from './routes/message.routes';
+import groupRoutes from './routes/group.routes';
 
-const postModule = Router();
+const chatModule = Router();
 
-postModule.use('/posts', postRouter);
-postModule.use('/comments', commentRouter);
+chatModule.use('/groups', groupRoutes);
+chatModule.use('/messages', messageRoutes);
 
-export default postModule;
+export default chatModule;
