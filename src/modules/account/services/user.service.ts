@@ -9,7 +9,6 @@ import { EAuthProvider, IUser } from '../models/user.model';
 import { AppError } from '~/utils/app-error';
 import { UserRepository } from '../repositories/user.repository';
 import { IErrors } from '~/types/error';
-import { NotificationModel } from '~/modules/notification/models/notification.model';
 // import { io, onlineUsers } from '~/config/redis';
 import { PostService } from '~/modules/post/services/post.service';
 import { BaseFilters } from '~/utils/repository';
@@ -27,6 +26,10 @@ export class UserService {
   static withoutPassword(user: IUser) {
     const { password, ...data } = user;
     return data;
+  }
+
+  static async getUsers(filters: BaseFilters, otherId?: string) {
+    return UserRepository.getPagination(filters, otherId);
   }
 
   static async getById(userId: string) {

@@ -25,6 +25,8 @@ export class MessageController {
 
   static async getMessages(request: Request, response: Response, next: NextFunction) {
     try {
+      const user = request.user as IUser;
+      const userId = String(user?._id);
       const query = request.query;
 
       const { page = 1, limit = 10, sort, order, filters } = query;
@@ -47,7 +49,7 @@ export class MessageController {
         });
       }
 
-      const result = await MessageService.getMessages(messageFilters);
+      const result = await MessageService.getMessages(userId, messageFilters);
 
       response.status(StatusCodes.OK).json(HttpResponse.get({ data: result }));
     } catch (error: any) {

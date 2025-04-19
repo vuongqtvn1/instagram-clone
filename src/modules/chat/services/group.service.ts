@@ -14,15 +14,15 @@ export class GroupService {
   };
 
   // get list group chat
-  static getListGroup = async (filters: GroupMessageFilters) => {
-    const result = await GroupRepository.getPagination(filters);
+  static getListGroup = async (userId: string, filters: GroupMessageFilters) => {
+    const result = await GroupRepository.getPagination({ ...filters, userId });
 
     return result;
   };
 
   // create group message
   static create = async (createdBy: string, data: CreateGroupDTO) => {
-    const { members, isGroup } = data;
+    const { members, isGroup, groupName, groupAvatar = 'https://github.com/shadcn.png' } = data;
 
     if (!isArray(members) || !members.length || !isBoolean(isGroup)) {
       throw new AppError({
@@ -57,6 +57,8 @@ export class GroupService {
     const group = await GroupRepository.createGroup(createdBy, {
       isGroup,
       members: memberIds,
+      groupAvatar,
+      groupName,
     });
 
     return group;

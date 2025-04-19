@@ -1,11 +1,10 @@
 import compression from 'compression';
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import morgan from 'morgan';
 import passport from 'passport';
 
-import { StatusCodes } from 'http-status-codes';
-import { connectDB } from './config/database';
 import { logger } from './config/logger';
 import i18nClient from './i18n';
 import './middlewares/passport';
@@ -13,8 +12,6 @@ import modules from './modules';
 import { AppError } from './utils/app-error';
 
 const app = express();
-
-connectDB();
 
 app.use(cors());
 app.use(morgan('dev'));

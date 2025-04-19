@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { IUser } from '~/modules/account/models/user.model';
-import { AppError } from '~/utils/app-error';
 import { tryParseJson } from '~/utils/helper';
 import { HttpResponse } from '~/utils/http-response';
 import { CreateGroupDTO, GroupMessageFilters, UpdateMemberGroupDTO } from '../dtos/group.dto';
@@ -42,7 +41,7 @@ export class GroupController {
         order: order === 'ASC' ? 'ASC' : 'DESC',
       };
 
-      const result = await GroupService.getListGroup(groupFilters);
+      const result = await GroupService.getListGroup(userId, groupFilters);
 
       response.status(StatusCodes.OK).json(HttpResponse.get({ data: result }));
     } catch (error: any) {

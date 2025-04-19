@@ -1,6 +1,6 @@
-import { NotificationModel } from '../models/notification.model';
+import { NotificationModel, NotificationType } from '../models/notification.model';
 
-export class CommentRepository {
+export class NotificationRepository {
   static getNotifications = async (receiverId: string) => {
     const notifications = await NotificationModel.find({ receiver: receiverId })
       .populate('sender', 'username avatar')
@@ -8,5 +8,16 @@ export class CommentRepository {
       .limit(20);
 
     return notifications;
+  };
+
+  static create = async (data: {
+    sender: string;
+    receiver: string[];
+    type: NotificationType;
+    targetId: string;
+  }) => {
+    const result = await NotificationModel.create(data);
+
+    return result.toObject();
   };
 }

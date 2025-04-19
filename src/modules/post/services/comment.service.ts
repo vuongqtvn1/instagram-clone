@@ -1,10 +1,13 @@
 import { StatusCodes } from 'http-status-codes';
+import { sendNotifyToWS } from '~/config/ws';
+import { UserService } from '~/modules/account/services/user.service';
+import { NotificationType } from '~/modules/notification/models/notification.model';
+import { NotificationService } from '~/modules/notification/services/notifaction.service';
 import { AppError } from '~/utils/app-error';
 import { BaseFilters } from '~/utils/repository';
 import { CreateCommentDTO, ReplyCommentDTO, UpdateCommentDTO } from '../dtos/comment.dto';
 import { CommentRepository } from '../repositories/comment.repository';
 import { PostRepository } from '../repositories/post.repository';
-import { UserService } from '~/modules/account/services/user.service';
 
 export class CommentService {
   static getListByPost = async (postId: string, filters: BaseFilters) => {
@@ -58,20 +61,14 @@ export class CommentService {
 
     // Gửi thông báo nếu người bình luận không phải chủ bài viết
     if (post.createdBy.toString() !== createdBy) {
-      // const notification = new Notification({
-      //   sender: userId,
-      //   receiver: post.user,
-      //   type: 'comment',
-      //   postId,
-      // });
-      // await notification.save();
-      // const receiverSocketId = onlineUsers.get(post.user.toString());
-      // if (receiverSocketId) {
-      //   io.to(receiverSocketId).emit('new_notification', {
-      //     sender: userId,
-      //     type: 'comment',
-      //   });
-      // }
+      const notification = await NotificationService.create({
+        sender: createdBy,
+        receiver: [String(post.createdBy)],
+        type: NotificationType.COMMENT,
+        targetId: postId,
+      });
+
+      sendNotifyToWS([String(post.createdBy)], notification);
     }
 
     return comment;

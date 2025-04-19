@@ -1,45 +1,67 @@
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
+import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
-import app from '~/app';
+
+import { MessageService } from '~/modules/chat/services/message.service';
 import { logger } from './logger';
 
-export class WebsocketClient {
-  private sockets: string[] = [];
-  private httpServer: Server<typeof IncomingMessage, typeof ServerResponse>;
+const onlineUsers = new Map(); // userId => socketId
 
-  constructor() {
-    this.httpServer = createServer(app);
-    const io = new SocketServer(this.httpServer, {
-      cors: { origin: 'http://localhost:5173' },
-    });
+const httpServer = createServer();
+const io = new SocketServer(httpServer, { cors: { origin: 'http://localhost:5173' } });
 
-    io.on('connection', (socket) => {
-      this.sockets.push(socket.id);
+io.on('connection', (socket) => {
+  onlineUsers.set('67f36d0f9ffdeb1751a965f5', socket.id);
 
-      logger.info('🔵 Người dùng kết nối:', socket.id);
+  logger.info('🔵 Người dùng kết nối:', socket.id);
 
-      socket.on('joinChat', (chatId) => {
-        socket.join(chatId);
-      });
+  socket.on('join-group', (groupId) => {
+    console.log('join-group', groupId);
+    socket.join(groupId);
+  });
 
-      socket.on('sendMessage', async ({ chatId, sender, text }) => {
-        // const message = new Message({ chatId, sender, text });
-        // await message.save();
-        // await Chat.findByIdAndUpdate(chatId, { lastMessage: message._id });
-        // io.to(chatId).emit('newMessage', message);
-      });
+  socket.on('send-message', async ({ groupId, message }) => {
+    console.log({ groupId, message });
+    io.to(groupId).emit('send-message', { groupId, message });
+  });
 
-      socket.on('disconnect', () => {
-        logger.info('🔴 Người dùng rời khỏi:', socket.id);
-      });
-    });
+  socket.on('send-message-ws', async ({ groupId, senderId, data }) => {
+    console.log('send-message-ws', { groupId, senderId, data });
+    const message = await MessageService.sendMessage(senderId, { ...data, groupId });
+
+    io.to(groupId).emit('send-message', { groupId, message });
+  });
+
+  socket.on('typing', ({ groupId, name }) => {
+    console.log({ groupId, name });
+    socket.to(groupId).emit('typing', { groupId, name });
+  });
+
+  socket.on('remove-typing', ({ groupId, name }) => {
+    console.log({ groupId, name });
+    socket.to(groupId).emit('remove-typing', { groupId, name });
+  });
+
+  socket.on('disconnect', () => {
+    logger.info('🔴 Người dùng rời khỏi:', socket.id);
+  });
+});
+
+httpServer.listen(4050, () => {
+  logger.info('🚀 Server Socket is running on http://localhost:4050');
+});
+
+export const sendNotifyToWS = (receivers: string[], notification: any) => {
+  const socketIds: string[] = [];
+
+  receivers.forEach((id) => {
+    const socketId = onlineUsers.get(String(id));
+
+    if (socketId) socketIds.push(socketId);
+  });
+
+  if (socketIds.length > 0) {
+    io.to(socketIds).emit('new_notification', notification);
   }
+};
 
-  async handle() {
-    logger.info('handle');
-  }
-
-  async start() {
-    this.httpServer.listen(4050);
-  }
-}
+export default io;

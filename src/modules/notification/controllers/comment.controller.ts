@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import { IUser } from '~/modules/account/models/user.model';
 import { HttpResponse } from '~/utils/http-response';
 import { CreateCommentDTO, UpdateCommentDTO } from '../dtos/comment.dto';
-import { CommentService } from '../services/comment.service';
+import { CommentService } from '../services/notifaction.service';
 
 export class CommentController {
   static async create(request: Request, response: Response, next: NextFunction) {

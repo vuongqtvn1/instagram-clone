@@ -3,11 +3,15 @@
 import { BaseFilters } from '~/utils/repository';
 
 export interface CreateGroupDTO {
+  groupName: string;
+  groupAvatar: string;
   members: string[];
   isGroup: boolean;
 }
 
 export interface UpdateMemberGroupDTO {
+  groupName: string;
+  groupAvatar: string;
   members: string[];
 }
 

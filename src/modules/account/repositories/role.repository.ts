@@ -25,7 +25,7 @@ export class RoleRepository {
       });
 
       await Promise.all(promises);
-      logger.info('Seeding permission successfully');
+      logger.info('🚀 Seeding permission successfully');
     }
   }
 

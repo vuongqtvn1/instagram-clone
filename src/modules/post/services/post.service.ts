@@ -1,5 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
+import { sendNotifyToWS } from '~/config/ws';
 import { UserService } from '~/modules/account/services/user.service';
+import { NotificationType } from '~/modules/notification/models/notification.model';
+import { NotificationService } from '~/modules/notification/services/notifaction.service';
 import { AppError } from '~/utils/app-error';
 import { CreatePostDTO, PostFilters, UpdatePostDTO } from '../dtos/post.dto';
 import { PostRepository } from '../repositories/post.repository';
@@ -121,6 +124,16 @@ export class PostService {
     }
 
     await PostRepository.likePost(postId, userLike);
+
+    // Gửi thông báo nếu người bình luận không phải chủ bài viết
+    const notification = await NotificationService.create({
+      sender: userLike,
+      receiver: [String(post.createdBy)],
+      type: NotificationType.LIKE_POST,
+      targetId: postId,
+    });
+
+    sendNotifyToWS([String(post.createdBy)], notification);
   }
 
   static async unlikePost(postId: string, userUnlike: string) {

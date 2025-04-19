@@ -3,6 +3,9 @@ import { MessageFilters, SendMessageDTO, UpdateMessageDTO } from '../dtos/messag
 import { AppError } from '~/utils/app-error';
 import { GroupService } from './group.service';
 import { MessageRepository } from '../repositories/message.repository';
+import { NotificationService } from '~/modules/notification/services/notifaction.service';
+import { NotificationType } from '~/modules/notification/models/notification.model';
+import { sendNotifyToWS } from '~/config/ws';
 
 export class MessageService {
   // send message to group
@@ -18,8 +21,6 @@ export class MessageService {
     }
 
     const group = await GroupService.getByGroupId(groupId);
-
-    console.log(group, groupId);
 
     if (!group) {
       throw new AppError({
@@ -59,16 +60,28 @@ export class MessageService {
       videos,
     });
 
-    // gửi socket đến những user đang online trong cái nhóm message này
+    const notification = await NotificationService.create({
+      sender: senderId,
+      receiver: memberIds,
+      type: NotificationType.SEND_MESSAGE,
+      targetId: String(message?._id),
+    });
+
+    sendNotifyToWS(memberIds, notification);
 
     return message;
   };
 
   // get message by condition
-  static getMessages = async (filters: MessageFilters) => {
-    const message = await MessageRepository.getPagination(filters);
+  static getMessages = async (userId: string, filters: MessageFilters) => {
+    const { data, totalData } = await MessageRepository.getPagination(filters);
 
-    return message;
+    const messages = data.map((item) => ({
+      ...item,
+      fromSelf: userId === String(item.sender),
+    }));
+
+    return { data: messages, totalData };
   };
 
   // update message

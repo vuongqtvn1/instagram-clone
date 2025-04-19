@@ -12,6 +12,7 @@ import {
 
 const router = Router();
 
+router.get('/', passport.authenticate('jwt', { session: false }), UserController.getUsers);
 router.post('/register', validate(registerUserSchema), UserController.register);
 router.post('/login', validate(loginUserSchema), UserController.login);
 router.get('/@me', passport.authenticate('jwt', { session: false }), UserController.getMe);

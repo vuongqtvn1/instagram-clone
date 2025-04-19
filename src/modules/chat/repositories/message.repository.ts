@@ -20,6 +20,7 @@ export class MessageRepository {
     const [data, totalData] = await Promise.all([
       MessageModel.find(condition)
         .sort(sort)
+        .populate('sender')
         .populate('replyMessage')
         .populate('seenBy', 'username email name avatar')
         .skip(paginate.skip)
@@ -32,16 +33,17 @@ export class MessageRepository {
   }
 
   static async getList() {
-    return MessageModel.find().lean();
+    return MessageModel.find().populate('sender').lean();
   }
 
   static async getById(id: string) {
-    return MessageModel.findById(id).lean();
+    return MessageModel.findById(id).populate('sender').lean();
   }
 
   static async create(sender: string, data: SendMessageDTO) {
     const result = await MessageModel.create({ ...data, sender });
-    return result.toObject();
+
+    return this.getById(String(result.toObject()._id));
   }
 
   static async update(

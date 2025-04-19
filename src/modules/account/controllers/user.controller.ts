@@ -61,6 +61,29 @@ export class UserController {
     }
   }
 
+  static async getUsers(request: Request, response: Response, next: NextFunction) {
+    try {
+      const user = request.user as IUser;
+      const userId = String(user?._id);
+      const query = request.query;
+
+      const { page = 1, limit = 20, sort, order } = query;
+
+      const filters: BaseFilters = {
+        page: Number(page),
+        limit: Number(limit),
+        sort: sort as string,
+        order: order === 'ASC' ? 'ASC' : 'DESC',
+      };
+
+      const data = await UserService.getUsers(filters, userId);
+
+      response.status(StatusCodes.OK).json(HttpResponse.get({ data }));
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async followUser(request: Request, response: Response, next: NextFunction) {
     try {
       const user = request.user as IUser;

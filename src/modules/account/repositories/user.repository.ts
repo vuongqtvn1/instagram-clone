@@ -1,7 +1,19 @@
+import { BaseFilters, BaseRepository } from '~/utils/repository';
 import { RegisterDTO, UserInformationDTO } from '../dtos/user.dto';
 import { EAuthProvider, IUser, UserModel } from '../models/user.model';
 
 export class UserRepository {
+  static async getPagination(filters: BaseFilters, otherId?: string) {
+    const condition: Record<string, any> = {};
+
+    if (otherId) {
+      condition._id = { $ne: otherId };
+    }
+
+    const result = BaseRepository.getPagination(UserModel, condition, filters);
+
+    return result;
+  }
   static async getByKey(key: keyof IUser, value: any) {
     return UserModel.findOne({ [key]: value }).lean();
   }

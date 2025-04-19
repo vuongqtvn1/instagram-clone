@@ -66,8 +66,7 @@ export class GroupRepository {
 
   static createGroup = async (createdBy: string, data: CreateGroupDTO) => {
     const newGroup = await GroupModel.create({
-      members: data.members,
-      isGroup: data.isGroup,
+      ...data,
       createdBy,
     });
 
